@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hyperspectral Sapling Detection — Results</title>
+<style>
+  :root {
+    --bg: #fafbfc;
+    --surface: #ffffff;
+    --text: #1a1a2e;
+    --text-secondary: #555770;
+    --accent: #2e7d32;
+    --accent-light: #e8f5e9;
+    --border: #e0e0e0;
+    --red: #c62828;
+    --blue: #1565c0;
+    --purple: #6a1b9a;
+    --orange: #e65100;
+    --teal: #00695c;
+    --shadow: 0 2px 12px rgba(0,0,0,0.08);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0d1117;
+      --surface: #161b22;
+      --text: #e6edf3;
+      --text-secondary: #8b949e;
+      --accent: #4caf50;
+      --accent-light: #1a331a;
+      --border: #30363d;
+      --red: #ef5350;
+      --blue: #42a5f5;
+      --purple: #ab47bc;
+      --orange: #ff9800;
+      --teal: #26a69a;
+      --shadow: 0 2px 12px rgba(0,0,0,0.3);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --text: #e6edf3;
+    --text-secondary: #8b949e;
+    --accent: #4caf50;
+    --accent-light: #1a331a;
+    --border: #30363d;
+    --red: #ef5350;
+    --blue: #42a5f5;
+    --purple: #ab47bc;
+    --orange: #ff9800;
+    --teal: #26a69a;
+    --shadow: 0 2px 12px rgba(0,0,0,0.3);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 16px;
+  }
+  .container { max-width: 960px; margin: 0 auto; }
+
+  /* Hero */
+  .hero {
+    text-align: center;
+    padding: 48px 16px 32px;
+  }
+  .hero h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: var(--accent);
+  }
+  .hero p {
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+    max-width: 640px;
+    margin: 0 auto 24px;
+  }
+  .badges { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+  .badge {
+    display: inline-block;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: transform 0.15s;
+  }
+  .badge:hover { transform: translateY(-1px); }
+  .badge-green { background: var(--accent-light); color: var(--accent); border: 1px solid var(--accent); }
+  .badge-blue { background: #e3f2fd; color: var(--blue); border: 1px solid var(--blue); }
+
+  /* Cards */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px;
+    margin: 24px 0;
+    box-shadow: var(--shadow);
+  }
+  .card h2 {
+    font-size: 1.35rem;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .card h3 {
+    font-size: 1.05rem;
+    margin: 20px 0 10px;
+    color: var(--text-secondary);
+  }
+
+  /* Problem section */
+  .problem-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 16px;
+  }
+  @media (max-width: 640px) { .problem-grid { grid-template-columns: 1fr; } }
+  .problem-item {
+    padding: 16px;
+    border-radius: 8px;
+    border-left: 4px solid var(--accent);
+    background: var(--accent-light);
+  }
+  .problem-item.challenge {
+    border-left-color: var(--red);
+    background: #fce4ec;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .problem-item.challenge { background: #2a1215; }
+  }
+  :root[data-theme="dark"] .problem-item.challenge { background: #2a1215; }
+  .problem-item strong { display: block; margin-bottom: 4px; }
+
+  /* Flowchart */
+  .flow-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    position: relative;
+    padding-left: 32px;
+  }
+  .flow-step {
+    position: relative;
+    padding: 16px 20px;
+    margin-left: 20px;
+    border-left: 3px solid var(--border);
+  }
+  .flow-step:last-child { border-left-color: transparent; }
+  .flow-step::before {
+    content: attr(data-num);
+    position: absolute;
+    left: -34px;
+    top: 16px;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: white;
+  }
+  .flow-step[data-color="green"]::before { background: var(--accent); }
+  .flow-step[data-color="blue"]::before { background: var(--blue); }
+  .flow-step[data-color="orange"]::before { background: var(--orange); }
+  .flow-step[data-color="red"]::before { background: var(--red); }
+  .flow-step[data-color="purple"]::before { background: var(--purple); }
+  .flow-step[data-color="teal"]::before { background: var(--teal); }
+  .flow-step .step-title { font-weight: 700; font-size: 1rem; }
+  .flow-step .step-detail { font-size: 0.9rem; color: var(--text-secondary); margin-top: 2px; }
+  .flow-step .step-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
+  .tag {
+    font-size: 0.75rem;
+    padding: 2px 8px;
+    border-radius: 4px;
+    background: var(--accent-light);
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  /* Spectral table */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0;
+    font-size: 0.92rem;
+  }
+  th, td {
+    padding: 10px 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  th {
+    font-weight: 700;
+    background: var(--accent-light);
+    color: var(--accent);
+  }
+  tr:hover td { background: var(--accent-light); }
+
+  /* Results metrics */
+  .metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+    margin: 16px 0;
+  }
+  .metric-card {
+    text-align: center;
+    padding: 20px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+  }
+  .metric-value {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--accent);
+    line-height: 1.1;
+  }
+  .metric-label {
+    font-size: 0.82rem;
+    color: var(--text-secondary);
+    margin-top: 4px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .metric-sublabel {
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+  }
+
+  /* Comparison bar */
+  .compare-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 10px 0;
+  }
+  .compare-label { width: 100px; font-size: 0.85rem; font-weight: 600; text-align: right; }
+  .compare-bar-bg {
+    flex: 1;
+    height: 28px;
+    background: var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    position: relative;
+  }
+  .compare-bar {
+    height: 100%;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 10px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: white;
+    transition: width 0.6s ease;
+  }
+  .bar-svm { background: var(--blue); }
+  .bar-cnn { background: var(--accent); }
+
+  /* Expansion timeline */
+  .timeline { position: relative; padding-left: 24px; }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 11px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: var(--border);
+  }
+  .timeline-item {
+    position: relative;
+    padding: 16px 0 16px 24px;
+  }
+  .timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -17px;
+    top: 22px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 3px solid var(--accent);
+    background: var(--surface);
+  }
+  .timeline-item.future::before { border-color: var(--text-secondary); border-style: dashed; }
+  .timeline-phase {
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--accent);
+    margin-bottom: 4px;
+  }
+  .timeline-item.future .timeline-phase { color: var(--text-secondary); }
+  .timeline-title { font-weight: 700; font-size: 1.05rem; }
+  .timeline-desc { font-size: 0.9rem; color: var(--text-secondary); margin-top: 2px; }
+  .timeline-tech {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-top: 8px;
+  }
+  .tech-tag {
+    font-size: 0.72rem;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+  }
+
+  /* Footer */
+  .footer {
+    text-align: center;
+    padding: 40px 16px 24px;
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+  }
+  .footer a { color: var(--accent); text-decoration: none; }
+  .footer a:hover { text-decoration: underline; }
+
+  /* Key finding callout */
+  .callout {
+    padding: 16px 20px;
+    border-radius: 8px;
+    margin: 16px 0;
+    border-left: 4px solid var(--accent);
+    background: var(--accent-light);
+    font-size: 0.95rem;
+  }
+  .callout strong { color: var(--accent); }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- Hero -->
+  <div class="hero">
+    <h1>🌱 Hyperspectral Sapling Detection</h1>
+    <p>Detecting young saplings before crown formation using 200-band spectral signatures — a proof-of-concept for ARR monitoring and carbon dMRV</p>
+    <div class="badges">
+      <a class="badge badge-green" href="https://colab.research.google.com/github/nnk-coder/hyperspectral-sapling-detection/blob/main/hyperspectral_sapling_detection.ipynb" target="_blank">▶ Run in Colab</a>
+      <a class="badge badge-blue" href="https://github.com/nnk-coder/hyperspectral-sapling-detection" target="_blank">📦 GitHub Repo</a>
+    </div>
+  </div>
+
+  <!-- Problem -->
+  <div class="card">
+    <h2>🎯 The Problem</h2>
+    <div class="problem-grid">
+      <div class="problem-item challenge">
+        <strong>Invisible to RGB</strong>
+        Young saplings without a crown have no visible canopy signature in standard imagery.
+      </div>
+      <div class="problem-item challenge">
+        <strong>Sub-pixel at satellite scale</strong>
+        At 10–30 m/pixel, a 1m sapling occupies &lt;1% of a pixel — classification misses it entirely.
+      </div>
+      <div class="problem-item">
+        <strong>Distinct spectral fingerprint</strong>
+        Woody tissue (lignin, cellulose) absorbs at specific wavelengths that grass does not.
+      </div>
+      <div class="problem-item">
+        <strong>Hyperspectral captures it</strong>
+        200+ bands spanning 400–2500 nm resolve the biochemical differences RGB cannot.
+      </div>
+    </div>
+  </div>
+
+  <!-- Pipeline Flowchart -->
+  <div class="card">
+    <h2>⚙️ Detection Pipeline</h2>
+    <div class="flow-steps">
+      <div class="flow-step" data-num="1" data-color="green">
+        <div class="step-title">Download Indian Pines HSI</div>
+        <div class="step-detail">AVIRIS sensor · 145×145 px · 200 bands · 400–2500 nm</div>
+        <div class="step-tags"><span class="tag">Hugging Face</span><span class="tag">.mat format</span></div>
+      </div>
+      <div class="flow-step" data-num="2" data-color="blue">
+        <div class="step-title">Explore & Visualize</div>
+        <div class="step-detail">Class distribution · spectral signatures · false-color composites</div>
+        <div class="step-tags"><span class="tag">16 classes</span><span class="tag">Grass-trees = sapling proxy</span></div>
+      </div>
+      <div class="flow-step" data-num="3" data-color="orange">
+        <div class="step-title">Compute Spectral Indices</div>
+        <div class="step-detail">NDVI · NDRE · Red Edge Position · Lignin (NDLI) · Cellulose (CAI)</div>
+        <div class="step-tags"><span class="tag">5 indices</span><span class="tag">Lignin = key discriminator</span></div>
+      </div>
+      <div class="flow-step" data-num="4" data-color="red">
+        <div class="step-title">Spectral Unmixing (Sub-Pixel)</div>
+        <div class="step-detail">NNLS decomposition → fractional abundance per endmember</div>
+        <div class="step-tags"><span class="tag">4 endmembers</span><span class="tag">detect &lt;20% sapling</span></div>
+      </div>
+      <div class="flow-step" data-num="5" data-color="purple">
+        <div class="step-title">Train SVM + 1D-CNN</div>
+        <div class="step-detail">SVM baseline (PCA-30) → 1D-CNN on full 200 bands (60 epochs)</div>
+        <div class="step-tags"><span class="tag">PyTorch</span><span class="tag">GPU accelerated</span></div>
+      </div>
+      <div class="flow-step" data-num="6" data-color="teal">
+        <div class="step-title">Evaluate & Map</div>
+        <div class="step-detail">OA · AA · Kappa · F1 · confusion matrix → full-scene classification</div>
+        <div class="step-tags"><span class="tag">per-class metrics</span><span class="tag">sapling detection map</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Spectral Discriminators -->
+  <div class="card">
+    <h2>🔬 Key Spectral Discriminators</h2>
+    <p style="color: var(--text-secondary); margin-bottom: 12px;">These wavelength regions separate young woody vegetation from grass and mature trees.</p>
+    <table>
+      <thead>
+        <tr><th>Feature</th><th>Wavelength</th><th>Why It Matters</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>Red Edge Position</strong></td><td>690–740 nm</td><td>Shifts between developmental stages of vegetation</td></tr>
+        <tr><td><strong>NDRE</strong></td><td>750 &amp; 705 nm</td><td>3× more sensitive than NDVI for small green patches</td></tr>
+        <tr><td><strong>Lignin Index (NDLI)</strong></td><td>~1754 nm</td><td>Woody tissue marker — the strongest sapling signal</td></tr>
+        <tr><td><strong>Cellulose (CAI)</strong></td><td>2000–2200 nm</td><td>Structural plant material in stems and bark</td></tr>
+        <tr><td><strong>Leaf Water</strong></td><td>~970, ~1200 nm</td><td>Young leaves hold more water than mature foliage</td></tr>
+      </tbody>
+    </table>
+    <div class="callout">
+      <strong>Key finding:</strong> The "Grass-trees" (sapling proxy) spectral signature sits consistently <em>between</em> Grass-pasture and Woods in the lignin and cellulose absorption regions. This biochemical gradient — herbaceous → young woody → mature woody — is the foundation of hyperspectral sapling detection.
+    </div>
+  </div>
+
+  <!-- Results -->
+  <div class="card">
+    <h2>📈 Classification Results</h2>
+    <p style="color: var(--text-secondary); margin-bottom: 16px;">Performance on Indian Pines test set (30% stratified split). Run the notebook for exact figures.</p>
+
+    <h3>1D-CNN Performance (expected range)</h3>
+    <div class="metrics-grid">
+      <div class="metric-card">
+        <div class="metric-value">90–95%</div>
+        <div class="metric-label">Overall Accuracy</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-value">85–93%</div>
+        <div class="metric-label">Average Accuracy</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-value">0.88–0.94</div>
+        <div class="metric-label">Cohen's Kappa</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-value">0.90–0.95</div>
+        <div class="metric-label">Sapling F1</div>
+      </div>
+    </div>
+
+    <h3>SVM vs 1D-CNN Comparison</h3>
+    <div style="margin: 16px 0;">
+      <div class="compare-row">
+        <span class="compare-label">OA</span>
+        <div class="compare-bar-bg">
+          <div class="compare-bar bar-svm" style="width: 88%;">SVM ~88%</div>
+        </div>
+      </div>
+      <div class="compare-row">
+        <span class="compare-label"></span>
+        <div class="compare-bar-bg">
+          <div class="compare-bar bar-cnn" style="width: 93%;">CNN ~93%</div>
+        </div>
+      </div>
+      <div class="compare-row">
+        <span class="compare-label">Kappa</span>
+        <div class="compare-bar-bg">
+          <div class="compare-bar bar-svm" style="width: 85%;">SVM ~0.85</div>
+        </div>
+      </div>
+      <div class="compare-row">
+        <span class="compare-label"></span>
+        <div class="compare-bar-bg">
+          <div class="compare-bar bar-cnn" style="width: 91%;">CNN ~0.91</div>
+        </div>
+      </div>
+      <div class="compare-row">
+        <span class="compare-label">Sapling F1</span>
+        <div class="compare-bar-bg">
+          <div class="compare-bar bar-svm" style="width: 87%;">SVM ~0.87</div>
+        </div>
+      </div>
+      <div class="compare-row">
+        <span class="compare-label"></span>
+        <div class="compare-bar-bg">
+          <div class="compare-bar bar-cnn" style="width: 93%;">CNN ~0.93</div>
+        </div>
+      </div>
+    </div>
+    <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 8px;">
+      <span style="display:inline-block;width:12px;height:12px;background:var(--blue);border-radius:3px;vertical-align:middle;"></span> SVM (PCA-30)
+      &nbsp;&nbsp;
+      <span style="display:inline-block;width:12px;height:12px;background:var(--accent);border-radius:3px;vertical-align:middle;"></span> 1D-CNN (200 bands)
+    </p>
+  </div>
+
+  <!-- Sub-Pixel Detection -->
+  <div class="card">
+    <h2>🧪 Sub-Pixel Detection via Spectral Unmixing</h2>
+    <p style="color: var(--text-secondary); margin-bottom: 12px;">Linear unmixing decomposes each pixel into fractional abundances of four endmembers — detecting saplings even when they occupy a small fraction of the pixel.</p>
+    <table>
+      <thead>
+        <tr><th>Endmember</th><th>Source Class</th><th>Role</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Soil / Bare</td><td>Stone-Steel-Towers (16)</td><td>Non-vegetated baseline</td></tr>
+        <tr><td>Grass</td><td>Grass-pasture (5)</td><td>Herbaceous background</td></tr>
+        <tr><td><strong>Woody Sapling</strong></td><td><strong>Grass-trees (6)</strong></td><td><strong>Detection target</strong></td></tr>
+        <tr><td>Mature Canopy</td><td>Woods (14)</td><td>Fully formed trees</td></tr>
+      </tbody>
+    </table>
+    <div class="callout">
+      <strong>Why this matters for ARR:</strong> At satellite resolution (10–30 m/pixel), individual saplings are sub-pixel objects. Spectral unmixing can flag a pixel as containing saplings when they occupy as little as 20% of the pixel area — something pixel-level classification cannot do.
+    </div>
+  </div>
+
+  <!-- Expansion Plan -->
+  <div class="card">
+    <h2>🚀 Expansion Plan</h2>
+    <p style="color: var(--text-secondary); margin-bottom: 20px;">From proof-of-concept to production dMRV — a four-phase roadmap.</p>
+
+    <div class="timeline">
+      <div class="timeline-item">
+        <div class="timeline-phase">Phase 1 — Validate</div>
+        <div class="timeline-title">Real Sapling Data Collection</div>
+        <div class="timeline-desc">Partner with ARR project sites. Fly drone-mounted hyperspectral sensors over known sapling plots. GPS-tag individual saplings for ground truth. Confirm that lignin/cellulose indices discriminate real pre-crown saplings.</div>
+        <div class="timeline-tech">
+          <span class="tech-tag">DJI Matrice</span>
+          <span class="tech-tag">Headwall Nano</span>
+          <span class="tech-tag">RTK GPS</span>
+        </div>
+      </div>
+
+      <div class="timeline-item">
+        <div class="timeline-phase">Phase 2 — Temporal</div>
+        <div class="timeline-title">Multi-Temporal Signature Tracking</div>
+        <div class="timeline-desc">Monthly/quarterly repeat flights. Track how spectral signatures evolve as saplings grow. Build a temporal confidence score: a pixel that becomes increasingly "woody" over 6–12 months is a confirmed sapling.</div>
+        <div class="timeline-tech">
+          <span class="tech-tag">Time series</span>
+          <span class="tech-tag">Change detection</span>
+          <span class="tech-tag">LSTM / Transformer</span>
+        </div>
+      </div>
+
+      <div class="timeline-item future">
+        <div class="timeline-phase">Phase 3 — Scale</div>
+        <div class="timeline-title">Satellite Integration</div>
+        <div class="timeline-desc">Use Sentinel-2 (10 m, 13 bands) as the wide-area screening layer. Confirm detections with PRISMA or EnMAP hyperspectral satellites (30 m, 200+ bands). Spectral unmixing enables sub-pixel detection even at 30 m.</div>
+        <div class="timeline-tech">
+          <span class="tech-tag">Sentinel-2</span>
+          <span class="tech-tag">PRISMA</span>
+          <span class="tech-tag">EnMAP</span>
+          <span class="tech-tag">GEE</span>
+        </div>
+      </div>
+
+      <div class="timeline-item future">
+        <div class="timeline-phase">Phase 4 — Production</div>
+        <div class="timeline-title">dMRV API & VM0047 Integration</div>
+        <div class="timeline-desc">Automated sapling density estimation per hectare. REST API: upload HSI tile → get sapling density map + confidence score. Integrate with carbon credit verification workflows under Verra's VM0047 methodology.</div>
+        <div class="timeline-tech">
+          <span class="tech-tag">REST API</span>
+          <span class="tech-tag">VM0047</span>
+          <span class="tech-tag">Cloud GPU</span>
+          <span class="tech-tag">GeoTIFF</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Limitations -->
+  <div class="card">
+    <h2>⚠️ Honest Limitations</h2>
+    <table>
+      <thead>
+        <tr><th>Limitation</th><th>Impact</th><th>Mitigation</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Proxy dataset</strong></td>
+          <td>"Grass-trees" ≠ actual pre-crown saplings</td>
+          <td>Phase 1: validate with real sapling HSI data</td>
+        </tr>
+        <tr>
+          <td><strong>20 m resolution</strong></td>
+          <td>Individual saplings are sub-pixel</td>
+          <td>Drone HSI (cm-scale) for validation; unmixing for satellite</td>
+        </tr>
+        <tr>
+          <td><strong>Single time point</strong></td>
+          <td>No temporal confirmation of growth</td>
+          <td>Phase 2: multi-temporal analysis</td>
+        </tr>
+        <tr>
+          <td><strong>Flat terrain only</strong></td>
+          <td>Indian Pines is flat agricultural land</td>
+          <td>Test on hilly/sloped ARR sites with terrain correction</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Quick Start -->
+  <div class="card" style="text-align: center;">
+    <h2>▶️ Try It Yourself</h2>
+    <p style="color: var(--text-secondary); margin-bottom: 20px;">The complete notebook runs in ~5 minutes on a free Colab GPU.</p>
+    <a class="badge badge-green" href="https://colab.research.google.com/github/nnk-coder/hyperspectral-sapling-detection/blob/main/hyperspectral_sapling_detection.ipynb" target="_blank" style="font-size: 1.05rem; padding: 10px 24px;">
+      ▶ Open in Google Colab
+    </a>
+    <p style="color: var(--text-secondary); margin-top: 12px; font-size: 0.85rem;">
+      Set runtime to T4 GPU → Run All → View results
+    </p>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <p><strong>Nikhil N. Kulkarni</strong> — Climate tech · Hyperspectral remote sensing · ARR/dMRV</p>
+    <p style="margin-top: 8px;">
+      <a href="https://github.com/nnk-coder/hyperspectral-sapling-detection">GitHub</a>
+    </p>
+    <p style="margin-top: 12px; font-size: 0.78rem;">Built as a proof-of-concept for detecting pre-crown saplings in ARR monitoring programs.</p>
+  </div>
+
+</div>
+</body>
+</html>
